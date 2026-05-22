@@ -152,7 +152,7 @@ export const GameUI = () => {
             <ActionButton
               icon={<Route size={18} />}
               label="敷設"
-              meta={state.railMode ? '3Dマップ選択中' : '停止中'}
+              meta={state.railMode ? '2Dマップ選択中' : '停止中'}
               active={state.railMode}
               onClick={state.toggleRailMode}
             />

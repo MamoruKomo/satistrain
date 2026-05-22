@@ -1,6 +1,6 @@
 # SatisTrain
 
-SatisTrain is a small 3D browser game prototype about growing from hand-dug iron into an automated railway economy.
+SatisTrain is a small 2D browser game prototype about growing from hand-dug iron into an automated railway economy.
 
 ## Current loop
 

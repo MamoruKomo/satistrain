@@ -1,9 +1,9 @@
 import { GameUI } from './components/GameUI';
-import { SatisTrainScene } from './scene/SatisTrainScene';
+import { SatisTrainMap2D } from './scene/SatisTrainMap2D';
 
 export const App = () => (
   <main className="app">
-    <SatisTrainScene />
+    <SatisTrainMap2D />
     <GameUI />
   </main>
 );
