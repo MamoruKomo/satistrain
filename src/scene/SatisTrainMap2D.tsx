@@ -136,7 +136,7 @@ const FacilityHub = ({ tile }: { tile: Tile }) => {
       <rect className="hub-window" x="10" y="17" width="10" height="7" rx="2" />
       <rect className="hub-chimney" x="15" y="-20" width="10" height="23" rx="3" />
       <text className="map-label" x="0" y="67" textAnchor="middle">
-        HUB
+        拠点
       </text>
     </g>
   );
@@ -166,7 +166,7 @@ const IronDeposit = ({ tile, onMine }: { tile: Tile; onMine: () => void }) => {
       <circle className="ore-node ore-node-c" cx="18" cy="21" r="12" />
       <path className="ore-vein" d="M -24 19 C -8 8, 8 9, 26 22" />
       <text className="map-label" x="0" y="66" textAnchor="middle">
-        IRON
+        鉄鉱床
       </text>
     </g>
   );
@@ -294,13 +294,17 @@ export const SatisTrainMap2D = () => {
         </defs>
 
         <rect className="map-water" x="0" y="0" width={VIEWBOX_WIDTH} height={VIEWBOX_HEIGHT} />
+        <path className="map-contour map-contour-a" d="M 108 444 C 232 320, 374 292, 506 374 C 646 460, 800 430, 948 294" />
+        <path className="map-contour map-contour-b" d="M 164 196 C 310 138, 448 184, 586 150 C 716 118, 820 150, 930 92" />
+        <path className="map-contour map-contour-c" d="M 210 564 C 366 494, 496 536, 612 482 C 732 426, 812 486, 936 422" />
         <path className="map-river" d="M 872 0 C 824 110, 890 176, 846 284 C 802 392, 896 458, 854 650" />
 
         <g className="tile-layer">
           {allTiles.map((tile) => {
             const key = tileKey(tile.x, tile.z);
             const isRail = railSet.has(key);
-            const placeable = canPlaceRail(state.railTiles, tile, state.inventory.rail);
+            const placeable =
+              state.railMode && canPlaceRail(state.railTiles, tile, state.inventory.rail);
             const hovered = hoveredKey === key;
             const classes = [
               'map-tile',
@@ -356,8 +360,8 @@ export const SatisTrainMap2D = () => {
           {route && <path className="rail-route-glow" d={routePath(route)} />}
         </g>
 
-        <GhostExpansion tile={{ x: 6, z: -3 }} label="CITY" />
-        <GhostExpansion tile={{ x: 4, z: 5 }} label="PORT" />
+        <GhostExpansion tile={{ x: 6, z: -3 }} label="都市" />
+        <GhostExpansion tile={{ x: 4, z: 5 }} label="港湾" />
         <FacilityHub tile={HUB_TILE} />
         <IronDeposit tile={IRON_TILE} onMine={state.mineIron} />
         <DrillIcon tile={IRON_TILE} active={state.drillBuilt} />
@@ -373,8 +377,8 @@ export const SatisTrainMap2D = () => {
       </svg>
 
       <div className="map-caption">
-        <span>2D MODE</span>
-        <strong>{route ? 'Iron line ready' : `${state.railTiles.length} track tiles`}</strong>
+        <span>{route ? '稼働線' : '計画線'}</span>
+        <strong>{route ? '鉄鉱床線 接続' : `${state.railTiles.length} / 鉄鉱床線`}</strong>
       </div>
     </section>
   );

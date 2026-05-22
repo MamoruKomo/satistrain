@@ -21,12 +21,27 @@ type ActionButtonProps = {
   onClick: () => void;
 };
 
+type StatChipProps = {
+  icon: ReactNode;
+  label: string;
+  value: string;
+  tone?: 'good' | 'warn';
+};
+
 const resourceLabels: Record<keyof Inventory, string> = {
   ore: '鉱石',
   ingot: '鋼塊',
   plate: '鉄板',
   rod: '鉄棒',
   rail: '線路'
+};
+
+const resourceUnits: Record<keyof Inventory, string> = {
+  ore: 'raw',
+  ingot: 'bar',
+  plate: 'pcs',
+  rod: 'pcs',
+  rail: 'tiles'
 };
 
 const ActionButton = ({
@@ -51,6 +66,16 @@ const ActionButton = ({
   </button>
 );
 
+const StatChip = ({ icon, label, value, tone }: StatChipProps) => (
+  <span className={`stat-chip${tone ? ` is-${tone}` : ''}`}>
+    <span className="stat-icon">{icon}</span>
+    <span>
+      <small>{label}</small>
+      <strong>{value}</strong>
+    </span>
+  </span>
+);
+
 export const GameUI = () => {
   const state = useGameStore();
   const route = findRailRoute(state.railTiles);
@@ -59,31 +84,28 @@ export const GameUI = () => {
   const objectiveProgress = `${Math.round(Math.min(objective.progress, 1) * 100)}%`;
 
   return (
-    <div className="ui-shell">
-      <header className="top-bar">
-        <div>
+    <div className="hud-shell">
+      <header className="command-bar">
+        <div className="brand-lockup">
           <p className="eyebrow">SATISTRAIN</p>
           <h1>開拓鉄道</h1>
+          <span>Ironworks Railway Desk</span>
         </div>
-        <div className="top-stats" aria-label="経営指標">
-          <span>
-            <Coins size={16} />
-            {state.money}cr
-          </span>
-          <span>
-            <Package size={16} />
-            搬入 {state.oreDelivered}
-          </span>
-          <span className={connected ? 'online' : 'offline'}>
-            <Route size={16} />
-            {connected ? '接続済' : '未接続'}
-          </span>
+        <div className="metric-row" aria-label="経営指標">
+          <StatChip icon={<Coins size={16} />} label="資金" value={`${state.money}cr`} />
+          <StatChip icon={<Package size={16} />} label="搬入" value={`${state.oreDelivered}`} />
+          <StatChip
+            icon={<Route size={16} />}
+            label="鉄鉱床線"
+            tone={connected ? 'good' : 'warn'}
+            value={connected ? '接続済' : '未接続'}
+          />
         </div>
       </header>
 
-      <aside className="side-panel">
-        <section className="panel-section objective">
-          <div className="section-title">
+      <aside className="left-console">
+        <section className="console-section objective-section">
+          <div className="section-heading">
             <span>現在の目標</span>
             <strong>{objectiveProgress}</strong>
           </div>
@@ -94,27 +116,33 @@ export const GameUI = () => {
           </div>
         </section>
 
-        <section className="panel-section">
-          <div className="section-title">
+        <section className="console-section inventory-section">
+          <div className="section-heading">
             <span>資材</span>
-            <strong>{state.inventory.rail} rail</strong>
+            <strong>{state.inventory.rail} tiles</strong>
           </div>
-          <div className="resource-grid">
+          <div className="resource-stack">
             {(Object.keys(resourceLabels) as Array<keyof Inventory>).map((key) => (
-              <div className="resource-cell" key={key}>
-                <small>{resourceLabels[key]}</small>
-                <strong>{state.inventory[key]}</strong>
+              <div className="resource-row" key={key}>
+                <span>
+                  <small>{resourceLabels[key]}</small>
+                  <strong>{state.inventory[key]}</strong>
+                </span>
+                <em>{resourceUnits[key]}</em>
               </div>
             ))}
           </div>
         </section>
+      </aside>
 
-        <section className="panel-section">
-          <div className="section-title">
-            <span>作業</span>
+      <aside className="right-console">
+        <section className="console-section actions-section">
+          <div className="section-heading">
+            <span>作業盤</span>
             <strong>{state.trainCargo > 0 ? `積載 ${state.trainCargo}` : '手作業'}</strong>
           </div>
-          <div className="action-grid">
+          <div className="action-group">
+            <span className="action-group-title">採掘と加工</span>
             <ActionButton
               icon={<Pickaxe size={18} />}
               label="掘る"
@@ -142,6 +170,10 @@ export const GameUI = () => {
               disabled={state.inventory.ingot < 1}
               onClick={state.craftRods}
             />
+          </div>
+
+          <div className="action-group">
+            <span className="action-group-title">鉄道建設</span>
             <ActionButton
               icon={<Route size={18} />}
               label="線路キット"
@@ -156,6 +188,10 @@ export const GameUI = () => {
               active={state.railMode}
               onClick={state.toggleRailMode}
             />
+          </div>
+
+          <div className="action-group">
+            <span className="action-group-title">自動化</span>
             <ActionButton
               icon={<Train size={18} />}
               label="機関車"
@@ -182,15 +218,13 @@ export const GameUI = () => {
             />
           </div>
         </section>
-
-        <section className="panel-section log">
-          <div className="section-title">
-            <span>ログ</span>
-            <strong>{state.railTiles.length} tiles</strong>
-          </div>
-          <p>{state.lastEvent}</p>
-        </section>
       </aside>
+
+      <footer className="event-strip">
+        <span>LOG</span>
+        <p>{state.lastEvent}</p>
+        <strong>{state.railTiles.length} tiles</strong>
+      </footer>
     </div>
   );
 };
